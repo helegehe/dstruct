@@ -22,7 +22,7 @@ func (d *DStruct) JSONNumber() {
 }
 
 func (d DStruct) MarshalJSON() ([]byte, error) {
-	return json.Marshal(d.kv)
+	return json.Marshal(d.values)
 }
 
 func (d *DStruct) jsonDecode(iter *jsoniter.Iterator) {

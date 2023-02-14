@@ -49,5 +49,5 @@ func (d *DStruct) UnmarshalBSON(data []byte) error {
 }
 
 func (d *DStruct) MarshalBSON() ([]byte, error) {
-	return bson.Marshal(d.kv)
+	return bson.Marshal(d.values)
 }

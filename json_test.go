@@ -2,6 +2,8 @@ package dstruct
 
 import (
 	"encoding/json"
+	"fmt"
+	"go.mongodb.org/mongo-driver/bson"
 	"reflect"
 	"strings"
 	"testing"
@@ -18,6 +20,22 @@ type testStruct struct {
 
 type kv map[string]interface{}
 
+type Person struct {
+	Name string   `bson:"name" json:"name"`
+	Age  int      `bson:"age" json:"age"`
+	Addr *Address `bson:"addr" json:"addr"`
+}
+
+type Address struct {
+	Province string `bson:"province" json:"province"`
+	City     string `bson:"city" json:"city"`
+	Street   string `bson:"street" json:"street"`
+	Zone *Zone
+}
+
+type Zone struct {
+	Code string `bson:"code" json:"code"`
+}
 func (k *kv) UnmarshalJSON(data []byte) error {
 	kv := make(map[string]interface{}, 0)
 	err := json.Unmarshal(data, &kv)
@@ -413,4 +431,50 @@ func TestValidatorUnmarshalJSON(t *testing.T) {
 		}
 
 	}
+}
+
+func TestEquals(t *testing.T) {
+	zone := &Zone{
+		Code: "123",
+	}
+	addr := &Address{
+		Province: "河南",
+		City:     "郑州",
+		Street:   "二七区",
+		Zone: zone,
+	}
+	p := &Person{
+		Name: "zhangsan",
+		Age:  10,
+		Addr: addr,
+	}
+
+	ds := &DStruct{}
+	//ds.SetFields(map[string]reflect.Type{
+	//	"name": reflect.TypeOf("zhangsan"),
+	//	"age":  reflect.TypeOf(10),
+	//	"addr": reflect.TypeOf(addr),
+	//})
+
+	ds.SetValues(map[string]interface{}{
+		"name": "zhangsan",
+		"age":  10,
+		"addr": addr,
+	})
+
+	jsonMarsh, _ := json.Marshal(p)
+	dsJsonMarsh, _ := ds.MarshalJSON()
+
+	fmt.Println(string(dsJsonMarsh))
+	fmt.Println("=======")
+	fmt.Println(string(jsonMarsh))
+	//require.Equal(t, jsonMarsh, dsJsonMarsh)
+
+	bsonMarsh, _ := bson.Marshal(p)
+	dsBsonMarsh, _ := ds.MarshalBSON()
+	fmt.Println(string(bsonMarsh))
+	fmt.Println("=======")
+	fmt.Println(string(dsBsonMarsh))
+	//require.Equal(t, bsonMarsh, dsBsonMarsh)
+
 }

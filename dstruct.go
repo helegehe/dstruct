@@ -58,7 +58,7 @@ type DStruct struct {
 
 	fields map[string]reflect.Type
 	kv     map[string]interface{}
-
+	values map[string]interface{}
 	// json Unmarshal 特有字段，数组类型是否使用jsonNumber
 	jsonNumber bool
 }
@@ -80,6 +80,19 @@ func (d *DStruct) SetFields(fields map[string]reflect.Type) {
 	}
 	for key, typ := range fields {
 		d.fields[key] = typ
+	}
+}
+
+func (d *DStruct)SetValues( values map[string]interface{}){
+	if d.values == nil{
+		d.values = make(map[string]interface{})
+	}
+	if d.fields == nil{
+		d.fields = make(map[string]reflect.Type)
+	}
+	for key,val := range values{
+		d.values[key] = val
+		d.fields[key] = reflect.TypeOf(val)
 	}
 }
 
